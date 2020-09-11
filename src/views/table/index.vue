@@ -1,79 +1,81 @@
 <template>
   <div class="app-container">
+    <el-backtop ></el-backtop>
     <el-table
       v-loading="listLoading"
-      :data="list"
+      :data="lists"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
+      <el-table-column align="center" label="使用者" width="110" prop="account">
       </el-table-column>
-      <el-table-column label="Title">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
+      <el-table-column label="檔名"  prop="filename">
       </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
+      <el-table-column label="狀態"  width="100" prop="status" >
+       <template slot-scope="scope">
+        <el-tag :type="scope.row.status === 'true' ?'primary':'success'"  disable-transitions>{{scope.row.status ? '正常' : '異常'}}</el-tag>  
+      </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
+      <el-table-column label="時間"  width="150" prop="time">
       </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
+      <el-table-column label="移除" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
+           <el-button
+          size="mini"
+           @click="handleDelete(scope.$index, scope.row)">移除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
   </div>
 </template>
-
+ 
 <script>
-import { getList } from '@/api/table'
+import axios from 'axios'
+
+ 
 
 export default {
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
-      list: null,
+      lists: [],
       listLoading: true
     }
   },
-  created() {
-    this.fetchData()
-  },
   methods: {
-    fetchData() {
-      this.listLoading = true
-      getList().then(response => {
-        this.list = response.data.items
-        this.listLoading = false
-      })
-    }
+      filterTag(value, row) {
+        return row.status === value;
+      },
+      handleDelete(index, row) {
+        var filename= row.filename
+        var time = row.time
+        console.log(filename);
+        console.log(time)
+
+        let formData = new FormData()
+        formData.set('filename', filename)
+        formData.set('time', time)
+
+        axios.post('http://localhost:9090/delete_record', formData)
+        .then(function (response) {
+          console.log('dd')
+        })
+        .catch(function(err){
+          console.error(err)
+        })
+
+      }
+  },
+  created() {
+    axios
+      .post('http://localhost:9090/file_record')
+      .then(
+        response => {
+          this.lists = response.data
+          this.listLoading = false
+        })
   }
 }
 </script>

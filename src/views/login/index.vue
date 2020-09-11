@@ -21,7 +21,7 @@
         />
       </el-form-item>
 
-      <el-form-item prop="password">
+        <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
@@ -39,14 +39,14 @@
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
-      </el-form-item>
+      </el-form-item>  
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
 
     </el-form>
   </div>
@@ -74,8 +74,9 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        //admin 111111
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

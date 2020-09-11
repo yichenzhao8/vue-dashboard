@@ -1,78 +1,45 @@
 <template>
-  <div class="app-container">
-    <el-input v-model="filterText" placeholder="Filter keyword" style="margin-bottom:30px;" />
-
-    <el-tree
-      ref="tree2"
-      :data="data2"
-      :props="defaultProps"
-      :filter-node-method="filterNode"
-      class="filter-tree"
-      default-expand-all
-    />
-
+<el-container>
+  <el-main>
+  <div>
+  <span style="vertical-align: -webkit-baseline-middle; font-size :2rem">{{checks.machine}}</span>
+  <el-button :style="color" circle style="margin-left:20px"></el-button>
   </div>
+  </el-main>
+</el-container>
 </template>
 
 <script>
-export default {
+import axios from 'axios'
 
+export default {
   data() {
     return {
-      filterText: '',
-      data2: [{
-        id: 1,
-        label: 'Level one 1',
-        children: [{
-          id: 4,
-          label: 'Level two 1-1',
-          children: [{
-            id: 9,
-            label: 'Level three 1-1-1'
-          }, {
-            id: 10,
-            label: 'Level three 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: 'Level one 2',
-        children: [{
-          id: 5,
-          label: 'Level two 2-1'
-        }, {
-          id: 6,
-          label: 'Level two 2-2'
-        }]
-      }, {
-        id: 3,
-        label: 'Level one 3',
-        children: [{
-          id: 7,
-          label: 'Level two 3-1'
-        }, {
-          id: 8,
-          label: 'Level two 3-2'
-        }]
-      }],
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      }
+      checks:[]
     }
   },
-  watch: {
-    filterText(val) {
-      this.$refs.tree2.filter(val)
-    }
+  mounted: function() {
+    axios
+      .get('http://localhost:9090/check_record')
+      .then((response)=>{
+        console.log(response.data)
+        this.checks=response.data
+      })
+      .catch((err)=>{
+        console.error(err);
+      })
   },
-
-  methods: {
-    filterNode(value, data) {
-      if (!value) return true
-      return data.label.indexOf(value) !== -1
-    }
+  computed:{
+     color(){
+       return this.checks.status? {background:'#67c23a'} :{background :'#f56c6c'};
+     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .el-button{
+    padding:18px
+  }
+</style>
 
